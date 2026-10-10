@@ -1,14 +1,23 @@
 "use client";
 import { useState } from "react";
 import { Link, Button } from "@heroui/react";
-import { useSession } from "@/src/lib/auth-client";
+import { signOut, useSession } from "@/src/lib/auth-client";
+import { Spinner } from "@heroui/react";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const { data: session } = useSession();
+    const { data: session, isPending } = useSession();
     console.log("user session in Navbar", session);
 
+    if (isPending) {
+        return (
+            <div className="flex flex-col items-center gap-2">
+                <Spinner size="md" />
+                <span className="text-xs text-muted">Loading...</span>
+            </div>
+        );
+    }
     const links = (
         <>
             <li>
@@ -34,12 +43,14 @@ export default function Navbar() {
             {session?.user ? (
                 <>
                     <span> Welcome, {session.user?.name}</span>
-                    <button>Sign Up</button>
+                    <button onClick={() => signOut}>Sign Out</button>
                 </>
             ) : (
                 <>
-                    <Link href="#">Login</Link>
-                    <Button>Sign Up</Button>
+                    <Link href="/sign-in">Login</Link>
+                    <Link href="/sign-up">
+                        <Button>Sign Up</Button>
+                    </Link>
                 </>
             )}
         </>
